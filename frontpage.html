@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontpage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <i class="bi bi-shop" style="width:25px; color:white;"></i>
+            <h1 style="color:white; font-size: xx-large; margin-right:28px;">Marketplace</h1>
+            <a class="navbar-brand" href="#">Frontpage</a>
+            <button class="navbar-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toogle-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="backoffice.html">Backoffice</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!--Contenuto dei prodotti-->
+    <div class="container mt-5">
+        <div class="row" id="productContainer">
+        </div>
+        <!--I prodotti caricati nella pagina "backoffice saranno visti qui"-->
+    </div>
+
+    <script>
+        //Funzione per effettuare una richiesta GET all'API
+        async function fetchProducts() {
+            try {
+                const response = await fetch('https://striveschool-api.herokuapp.com/api/product/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTFmMzZjMmM3Mjg4NzAwMTg4N2ZmM2QiLCJpYXQiOjE2OTY1NDQ0NTAsImV4cCI6MTY5Nzc1NDA1MH0.MEtdkqtTYCkbUbEv4ewfI5r1Jx3tV7Dqkr6YjNa8F9U'
+                    }
+                });
+
+                if (response.ok) {
+                    const products = await response.json();
+                    renderProducts(products);
+                } else {
+                    console.error('Errore nella richiesta GET:', response.status);
+                }
+            } catch (error) {
+                console.error('Errore nella richiesta GET:', error);
+            }
+        }
+
+        //Qui ce la funzione per vedere i prodotti nella frontpage
+        function renderProducts(products) {
+            const productContainer = document.getElementById("productContainer");
+            productContainer.innerHTML = "";
+
+            products.forEach((product, index) => {
+                const col = document.createElement("div");
+                col.className = "col-md-4 mb-4";
+
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                    <img src="${product.imageUrl}"
+                    class="card-img-top" alt="${product.name}">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}
+                        </h5>
+                        <p class="card-text">${product.description}</p>
+                        <p class="card-text"><strong>Brand:</strong> ${product.brand}</p>
+                        <p class="card-text">Price: $${product.price.toFixed(2)}</p>
+                    </div>
+                `;
+
+                //Evento "click" per aprire la pagina del prodotto
+                card.addEventListener("click", () => {
+                    window.location.href = `product.html?id=${product._id}`;
+                });
+
+                col.appendChild(card);
+                productContainer.appendChild(col);
+            });
+        }
+
+        //Qui la funzione per inizializzare la pagina
+        function init() {
+            fetchProducts();
+        }
+
+        init();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
